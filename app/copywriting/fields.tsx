@@ -1,13 +1,4 @@
-import {
-  Col,
-  Row,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  InputNumber,
-  Button,
-} from "antd";
+import { Col, Row, Form, Input, Select, InputNumber, Button } from "antd";
 import { FieldType } from "./types";
 const { Item } = Form;
 
@@ -42,47 +33,6 @@ export const getFields = ({
             min={0}
             max={100}
             placeholder="最大值"
-          />
-        </Item>
-      </Col>
-      <Col span={6}>
-        <Item<FieldType> label="日期" name="last_date">
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
-        </Item>
-      </Col>
-      <Col span={6}>
-        <Item<FieldType> label="PV" name="last_pv">
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="请输入PV"
-          />
-        </Item>
-      </Col>
-      <Col span={6}>
-        <Item<FieldType> label="UV" name="last_uv">
-          <InputNumber
-            style={{ width: "100%" }}
-            min={0}
-            placeholder="请输入UV"
-          />
-        </Item>
-      </Col>
-      <Col span={6}>
-        <Item<FieldType> label="文案类型" name="type_list">
-          <Select
-            mode="tags"
-            placeholder="请选择或输入文案类型"
-            style={{ width: "100%" }}
-          />
-        </Item>
-      </Col>
-      <Col span={6}>
-        <Item<FieldType> label="组件列表" name="component_list">
-          <Select
-            mode="tags"
-            placeholder="请选择或输入组件"
-            style={{ width: "100%" }}
           />
         </Item>
       </Col>

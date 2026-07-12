@@ -3,11 +3,6 @@ export type FieldType = {
   cluster_content?: string;
   score_min?: number;
   score_max?: number;
-  last_date?: string;
-  last_pv?: number;
-  last_uv?: number;
-  type_list?: string[];
-  component_list?: string[];
   sif_app_id?: number;
   sif_app_name?: string;
   sub_app_id?: number;

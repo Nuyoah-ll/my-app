@@ -33,6 +33,9 @@ export default function CopywritingPage() {
       { total: number; list: CopywritingRecord[] } | undefined
     >(`http://localhost:3001/copywriting/list`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
       body: JSON.stringify({ ...params, current, pageSize }),
     });
     console.log(res, "res");
