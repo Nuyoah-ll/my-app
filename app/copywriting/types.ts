@@ -16,6 +16,50 @@ export type FieldType = {
   psm?: string;
 };
 
+export type OperateType = 0 | 1 | 2 | 3 | 4;
+
+export interface OperateLogFieldType {
+  operate_type?: OperateType;
+  create_by?: string;
+}
+
+export interface CopywritingLogRecord {
+  id: number;
+  content_id: number;
+  operate_type: OperateType;
+  operate_info: string;
+  create_by: string;
+  create_at: string;
+}
+
+export type HistoryType = 1 | 2;
+
+export interface ModifyLogFieldType {
+  type?: HistoryType;
+  create_by?: string;
+  modified_content?: string;
+  modified_score_min?: number;
+  modified_score_max?: number;
+}
+
+export interface CopywritingHistoryRecord {
+  id: number;
+  content_id: number;
+  cluster_content: string;
+  modified_content: string;
+  score: number;
+  modified_score: number;
+  reason: string;
+  modified_reason: string;
+  dimension_scores: { score: number; weight: number; type: string }[];
+  modified_dimension_scores: { score: number; weight: number; type: string }[];
+  create_by: string;
+  create_at: string;
+  model_info: Record<string, unknown> | null;
+  type: HistoryType;
+  is_approved: boolean;
+}
+
 export interface CopywritingRecord {
   id: number;
   last_date: string;
