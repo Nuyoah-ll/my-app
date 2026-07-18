@@ -1,13 +1,13 @@
 import { ColumnsType } from "antd/es/table";
-import { CopywritingLogRecord } from "../types";
+import { CopywritingLogRecord, CopywritingOperateType } from "../types";
 import { Tag } from "antd";
 
 const operateTypeMap: Record<number, { label: string; color: string }> = {
-  0: { label: "初始化", color: "gray" },
-  1: { label: "修改文案 - AI", color: "blue" },
-  2: { label: "修改文案 - 人工", color: "green" },
-  3: { label: "采纳", color: "purple" },
-  4: { label: "取消采纳", color: "red" },
+  [CopywritingOperateType.Init]: { label: "初始化", color: "gray" },
+  [CopywritingOperateType.ModifyByModel]: { label: "修改文案 - AI", color: "blue" },
+  [CopywritingOperateType.ModifyByHuman]: { label: "修改文案 - 人工", color: "green" },
+  [CopywritingOperateType.Accept]: { label: "采纳", color: "purple" },
+  [CopywritingOperateType.Reject]: { label: "取消采纳", color: "red" },
 };
 
 export const getColumns = (): ColumnsType<CopywritingLogRecord> => [

@@ -1,9 +1,9 @@
 "use client";
 
 import { Table, Form, message } from "antd";
-import { useAntdTable } from "ahooks";
+import { useAntdTable, useRequest } from "ahooks";
 import { CopywritingHistoryRecord, ModifyLogFieldType } from "../types";
-import { getColumns, renderExpandRow } from "./columns";
+import { getColumns } from "./columns";
 import { getFields } from "./fields";
 import { useSearchParams } from "next/navigation";
 
@@ -36,7 +36,12 @@ export default function ModifyLogPage() {
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
-      body: JSON.stringify({ content_id: contentId, ...params, current, pageSize }),
+      body: JSON.stringify({
+        content_id: contentId,
+        ...params,
+        current,
+        pageSize,
+      }),
     });
     return {
       total: res?.total || 0,
@@ -44,39 +49,34 @@ export default function ModifyLogPage() {
     };
   };
 
-  const { tableProps, search, refresh } = useAntdTable(getTableData, { form: form });
+  const { tableProps, search, refresh } = useAntdTable(getTableData, {
+    form: form,
+  });
 
-  const handleApprove = async (id: number) => {
-    try {
-      await request(`http://localhost:3001/copywriting/approve_history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        body: JSON.stringify({ id }),
-      });
-      message.success("采纳成功");
-      refresh();
-    } catch (error) {
-      message.error("采纳失败");
-    }
-  };
-
-  const handleCancelApprove = async (id: number) => {
-    try {
-      await request(`http://localhost:3001/copywriting/cancel_approve_history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        body: JSON.stringify({ id }),
-      });
-      message.success("取消采纳成功");
-      refresh();
-    } catch (error) {
-      message.error("取消采纳失败");
-    }
-  };
+  const {
+    runAsync: handleChangeApproveStatus,
+    loading: handleChangeApproveStatusLoading,
+  } = useRequest(
+    async (id: number, isApproved: boolean) => {
+      try {
+        await request(
+          `http://localhost:3001/copywriting/change_approve_status`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+            },
+            body: JSON.stringify({ id, is_approved: isApproved }),
+          },
+        );
+        message.success("修改采纳状态成功");
+        refresh();
+      } catch (error) {
+        message.error("修改采纳状态失败");
+      }
+    },
+    { manual: true },
+  );
 
   return (
     <div>
@@ -90,12 +90,9 @@ export default function ModifyLogPage() {
             ...tableProps.pagination,
             showTotal: (t) => `共 ${t}条`,
           }}
-          columns={getColumns(handleApprove, handleCancelApprove)}
+          columns={getColumns(handleChangeApproveStatus, handleChangeApproveStatusLoading)}
           rowKey="id"
           scroll={{ x: "max-content" }}
-          expandable={{
-            expandedRowRender: renderExpandRow,
-          }}
         />
       </div>
     </div>

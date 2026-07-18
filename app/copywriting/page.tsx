@@ -1,13 +1,19 @@
 "use client";
 
-import { Form, Input, Table, Modal } from "antd";
+import { Form, Table } from "antd";
 import { useAntdTable } from "ahooks";
-import { CopywritingRecord, FieldType } from "./types";
+import {
+  CopywritingRecord,
+  FieldType,
+} from "./types";
 import { getColumns } from "./columns";
 import { getFields } from "./fields";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { request } from "../utils/request";
+import EditCopywritingModal from "./components/edit-copywriting-modal";
+import GenerateCopywritingModal from "./components/generate-copywriting-modal";
 
 const formStyle: React.CSSProperties = {
   maxWidth: "none",
@@ -16,6 +22,12 @@ const formStyle: React.CSSProperties = {
 export default function CopywritingPage() {
   const [form] = Form.useForm<FieldType>();
   const router = useRouter();
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editModalRecord, setEditModalRecord] =
+    useState<CopywritingRecord | null>(null);
+  const [generateModalVisible, setGenerateModalVisible] = useState(false);
+  const [generateModalRecord, setGenerateModalRecord] =
+    useState<CopywritingRecord | null>(null);
 
   const getTableData = async ({
     current,
@@ -57,22 +69,13 @@ export default function CopywritingPage() {
   };
 
   const handleEditCopywriting = (record: CopywritingRecord) => {
-    Modal.confirm({
-      title: "修改文案",
-      content: (
-        <div>
-          <label style={{ display: "block", marginBottom: 8 }}>原始文案</label>
-          <Input.TextArea
-            defaultValue={record.cluster_content}
-            style={{ width: "100%" }}
-            rows={4}
-          />
-        </div>
-      ),
-      onOk: () => {
-        console.log("确认修改文案:", record.id);
-      },
-    });
+    setEditModalRecord(record);
+    setEditModalVisible(true);
+  };
+
+  const handleGenerateCopywritingByModel = (record: CopywritingRecord) => {
+    setGenerateModalRecord(record);
+    setGenerateModalVisible(true);
   };
 
   return (
@@ -91,11 +94,28 @@ export default function CopywritingPage() {
             handleToOperateLog,
             handleToModifyLog,
             handleEditCopywriting,
+            handleGenerateCopywritingByModel,
           })}
           rowKey="id"
           scroll={{ x: "max-content" }}
         />
       </div>
+      {editModalVisible ? (
+        <EditCopywritingModal
+          visible={editModalVisible}
+          onCancel={() => setEditModalVisible(false)}
+          onSuccess={() => search.submit()}
+          record={editModalRecord}
+        />
+      ) : null}
+      {generateModalVisible ? (
+        <GenerateCopywritingModal
+          visible={generateModalVisible}
+          onCancel={() => setGenerateModalVisible(false)}
+          record={generateModalRecord}
+          onSuccess={() => search.submit()}
+        />
+      ) : null}
     </div>
   );
 }

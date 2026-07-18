@@ -1,13 +1,13 @@
 import { Col, Row, Form, Input, Select, Button } from "antd";
-import { OperateLogFieldType } from "../types";
+import { CopywritingOperateType, OperateLogFieldType } from "../types";
 const { Item } = Form;
 
 const operateTypeOptions = [
-  { value: 0, label: "初始化" },
-  { value: 1, label: "修改文案 - AI" },
-  { value: 2, label: "修改文案 - 人工" },
-  { value: 3, label: "采纳" },
-  { value: 4, label: "取消采纳" },
+  { value: CopywritingOperateType.Init, label: "初始化" },
+  { value: CopywritingOperateType.ModifyByModel, label: "修改文案 - AI" },
+  { value: CopywritingOperateType.ModifyByHuman, label: "修改文案 - 人工" },
+  { value: CopywritingOperateType.Accept, label: "采纳" },
+  { value: CopywritingOperateType.Reject, label: "取消采纳" },
 ];
 
 export const getFields = ({

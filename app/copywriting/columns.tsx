@@ -1,19 +1,25 @@
 import { ColumnsType } from "antd/es/table";
 import { CopywritingRecord } from "./types";
 import { Button, Space, Tag } from "antd";
-import { safeParseJson } from "../utils/json";
 
 export const getColumns = ({
   handleToOperateLog,
   handleToModifyLog,
   handleEditCopywriting,
+  handleGenerateCopywritingByModel,
 }: {
   handleToOperateLog: (record: CopywritingRecord) => void;
   handleToModifyLog: (record: CopywritingRecord) => void;
   handleEditCopywriting: (record: CopywritingRecord) => void;
+  handleGenerateCopywritingByModel: (record: CopywritingRecord) => void;
 }): ColumnsType<CopywritingRecord> => [
   { title: "主键ID", dataIndex: "id", key: "id", width: 120 },
-  { title: "日期", dataIndex: "last_date", key: "last_date", width: 120 },
+  {
+    title: "上次透出时间",
+    dataIndex: "last_date",
+    key: "last_date",
+    width: 120,
+  },
   {
     title: "原始文案",
     dataIndex: "cluster_content",
@@ -40,6 +46,13 @@ export const getColumns = ({
         }) || []
       );
     },
+  },
+  {
+    title: "采纳文案",
+    dataIndex: "approve_content",
+    key: "approve_content",
+    width: 300,
+    render: (val) => val || "-",
   },
   { title: "PV", dataIndex: "last_pv", key: "last_pv", width: 100 },
   { title: "UV", dataIndex: "last_uv", key: "last_uv", width: 100 },
@@ -151,7 +164,7 @@ export const getColumns = ({
     title: "操作",
     key: "action",
     fixed: "right",
-    width: 280,
+    width: 400,
     render: (_, record) => (
       <span>
         <Button type="link" onClick={() => handleToOperateLog(record)}>
@@ -161,7 +174,13 @@ export const getColumns = ({
           文案修改记录
         </Button>
         <Button type="link" onClick={() => handleEditCopywriting(record)}>
-          修改文案
+          人工修改文案
+        </Button>
+        <Button
+          type="link"
+          onClick={() => handleGenerateCopywritingByModel(record)}
+        >
+          大模型修改文案
         </Button>
       </span>
     ),

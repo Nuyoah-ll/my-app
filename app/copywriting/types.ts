@@ -1,4 +1,3 @@
-
 export type FieldType = {
   cluster_content?: string;
   score_min?: number;
@@ -35,6 +34,7 @@ export interface CopywritingLogRecord {
 export type HistoryType = 1 | 2;
 
 export interface ModifyLogFieldType {
+  is_approved?: boolean;
   type?: HistoryType;
   create_by?: string;
   modified_content?: string;
@@ -45,17 +45,12 @@ export interface ModifyLogFieldType {
 export interface CopywritingHistoryRecord {
   id: number;
   content_id: number;
-  cluster_content: string;
   modified_content: string;
-  score: number;
   modified_score: number;
-  reason: string;
   modified_reason: string;
-  dimension_scores: { score: number; weight: number; type: string }[];
   modified_dimension_scores: { score: number; weight: number; type: string }[];
   create_by: string;
   create_at: string;
-  model_info: Record<string, unknown> | null;
   type: HistoryType;
   is_approved: boolean;
 }
@@ -66,7 +61,8 @@ export interface CopywritingRecord {
   cluster_content: string;
   score: number;
   reason: string;
-  dimension_scores: { score: number, weight: number, type: string }[];
+  dimension_scores: { score: number; weight: number; type: string }[];
+  approve_content?: string;
   last_pv: number;
   last_uv: number;
   type_list: string[];
@@ -97,4 +93,60 @@ export interface CopywritingRecord {
   update_by: string;
   cluster_content_hash: string;
   req_api_hash: string;
+}
+
+export interface ModifyContentFieldType {
+  modified_content: string;
+}
+
+export interface DimensionScore {
+  score: number;
+  weight: number;
+  type: string;
+}
+
+export interface GetCopywritingScoreResponse {
+  contents: {
+    content: string;
+    score: number;
+    reason: string;
+    dimension_scores: DimensionScore[];
+  }[];
+}
+
+export interface GenerateCopywritingByModelResponse {
+  modified_contents: {
+    modified_content: string;
+    modified_score: number;
+    modified_reason: string;
+    modified_dimension_scores: {
+      score: number;
+      weight: number;
+      type: string;
+    }[];
+  }[];
+}
+
+export interface UpdateCopywritingRequest {
+  id: number;
+  type: number; // 1 人工 2 大模型
+  model_info?: string; // 大模型相关的信息，json字符串
+  modified_content: string;
+  modified_score: number;
+  modified_reason: string;
+  modified_dimension_scores: DimensionScore[];
+}
+
+
+export enum CopywritingUpdateType {
+  Model = 1,
+  Human = 2,
+}
+
+export enum CopywritingOperateType {
+  Init = 0,
+  ModifyByModel = 1,
+  ModifyByHuman = 2,
+  Accept = 3,
+  Reject = 4,
 }

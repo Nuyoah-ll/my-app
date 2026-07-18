@@ -1,10 +1,10 @@
 import { Col, Row, Form, Input, Select, Button, InputNumber } from "antd";
-import { ModifyLogFieldType } from "../types";
+import { CopywritingUpdateType, ModifyLogFieldType } from "../types";
 const { Item } = Form;
 
 const typeOptions = [
-  { value: 1, label: "人工" },
-  { value: 2, label: "大模型" },
+  { value: CopywritingUpdateType.Human, label: "人工" },
+  { value: CopywritingUpdateType.Model, label: "大模型" },
 ];
 
 export const getFields = ({
@@ -16,6 +16,14 @@ export const getFields = ({
 }) => (
   <>
     <Row gutter={[16, 0]}>
+      <Col span={8}>
+        <Item<ModifyLogFieldType> label="是否采纳" name="is_approved">
+          <Select style={{ width: "100%" }} placeholder="请选择是否采纳">
+            <Select.Option value={true}>已采纳</Select.Option>
+            <Select.Option value={false}>未采纳</Select.Option>
+          </Select>
+        </Item>
+      </Col>
       <Col span={8}>
         <Item<ModifyLogFieldType> label="生成方式" name="type">
           <Select style={{ width: "100%" }} placeholder="请选择生成方式">
@@ -38,7 +46,10 @@ export const getFields = ({
         </Item>
       </Col>
       <Col span={8}>
-        <Item<ModifyLogFieldType> label="修改后文案评分" name="modified_score_min">
+        <Item<ModifyLogFieldType>
+          label="修改后文案评分"
+          name="modified_score_min"
+        >
           <InputNumber
             placeholder="最低"
             style={{ width: "100%" }}
@@ -48,7 +59,10 @@ export const getFields = ({
         </Item>
       </Col>
       <Col span={8}>
-        <Item<ModifyLogFieldType> label="修改后文案评分" name="modified_score_max">
+        <Item<ModifyLogFieldType>
+          label="修改后文案评分"
+          name="modified_score_max"
+        >
           <InputNumber
             placeholder="最高"
             style={{ width: "100%" }}
