@@ -137,7 +137,6 @@ export interface UpdateCopywritingRequest {
   modified_dimension_scores: DimensionScore[];
 }
 
-
 export enum CopywritingUpdateType {
   Model = 1,
   Human = 2,
@@ -149,4 +148,12 @@ export enum CopywritingOperateType {
   ModifyByHuman = 2,
   Accept = 3,
   Reject = 4,
+}
+
+export interface GetApproveCopywritingFieldType {
+  sif_app_id: number;
+  sub_app_id: number;
+  pid: number;
+  conetent: string;
+  req_api: string;
 }

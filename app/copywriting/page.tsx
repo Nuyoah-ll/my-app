@@ -1,11 +1,8 @@
 "use client";
 
-import { Form, Table } from "antd";
+import { Button, Form, Table } from "antd";
 import { useAntdTable } from "ahooks";
-import {
-  CopywritingRecord,
-  FieldType,
-} from "./types";
+import { CopywritingRecord, FieldType } from "./types";
 import { getColumns } from "./columns";
 import { getFields } from "./fields";
 import { useRouter } from "next/navigation";
@@ -14,6 +11,7 @@ import { useState } from "react";
 import { request } from "../utils/request";
 import EditCopywritingModal from "./components/edit-copywriting-modal";
 import GenerateCopywritingModal from "./components/generate-copywriting-modal";
+import SearchApproveCopywritingModal from "./components/search-approve-copywriting-modal";
 
 const formStyle: React.CSSProperties = {
   maxWidth: "none",
@@ -28,6 +26,8 @@ export default function CopywritingPage() {
   const [generateModalVisible, setGenerateModalVisible] = useState(false);
   const [generateModalRecord, setGenerateModalRecord] =
     useState<CopywritingRecord | null>(null);
+  const [searchApproveModalVisible, setSearchApproveModalVisible] =
+    useState(false);
 
   const getTableData = async ({
     current,
@@ -83,6 +83,9 @@ export default function CopywritingPage() {
       <Form form={form} colon={false} style={formStyle}>
         {getFields({ onSearch: search.submit, onReset: search.reset })}
       </Form>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button onClick={() => setSearchApproveModalVisible(true)}>查找替换文案</Button>
+      </div>
       <div style={{ padding: 24 }}>
         <Table
           {...tableProps}
@@ -116,6 +119,10 @@ export default function CopywritingPage() {
           onSuccess={() => search.submit()}
         />
       ) : null}
+      <SearchApproveCopywritingModal
+        visible={searchApproveModalVisible}
+        onCancel={() => setSearchApproveModalVisible(false)}
+      />
     </div>
   );
 }
