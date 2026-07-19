@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Menu } from "antd";
 import "./globals.css";
+import { useEffect } from "react";
+import { initSifSdk } from "./web-sdk/sif-sdk";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +26,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  useEffect(() => {
+    initSifSdk({ sifAppId: 1001, subAppId: 2001 });
+  }, []);
+
   return (
     <html
       lang="en"
@@ -31,9 +38,11 @@ export default function RootLayout({
     >
       <body>
         <div className="w-full">
-          <Menu direction="ltr" mode="horizontal"
+          <Menu
+            direction="ltr"
+            mode="horizontal"
             items={[
-              { key: "/", label: <Link href="/" >Home</Link> },
+              { key: "/", label: <Link href="/">Home</Link> },
               {
                 key: "/copywriting",
                 label: <Link href="/copywriting">Copywriting</Link>,
