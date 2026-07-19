@@ -27,36 +27,36 @@ const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => {
 };
 
 const fetchTransformText = async (
-  text: string,
+  content: string,
   reqApi: string,
 ): Promise<string> => {
   const jsonRes = await fetch(
     `http://localhost:3001/copywriting/get_approve_copywriting?${qs.stringify({
-      text,
-      sif_app_id: window.__sif_app_id__,
-      sub_app_id: window.__sub_app_id__,
-      pid: location.pathname,
-      req_api: reqApi,
+      content, // 文案
+      sif_app_id: window.__sif_app_id__, // 来自于sif-sdk注入的体验平台ID
+      sub_app_id: window.__sub_app_id__, // 来自于sif-sdk注入的子应用ID
+      pid: location.pathname, // 当前页面的路径
+      req_api: reqApi, // 拦截器里通过config获取到请求url的路径
     })}`,
     { method: "GET" },
   );
   const res = await jsonRes.json();
-  return res?.data || text;
+  return res?.data || content;
 };
 
 // 在请求拦截器里可以通过 response.config?.url 拿到 reqApi
 export async function getTransformText(
-  text: string,
+  content: string,
   reqApi = "",
   timeout = 200,
 ): Promise<string> {
   try {
     const transformedText = await withTimeout(
-      fetchTransformText(text, reqApi),
+      fetchTransformText(content, reqApi),
       timeout,
     );
     return transformedText;
   } catch {
-    return text;
+    return content;
   }
 }
