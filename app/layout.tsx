@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Menu } from "antd";
 import "./globals.css";
+import { SDKInitializer } from "./components/sdk-initializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,27 +25,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body>
-        <div className="w-full">
+        <SDKInitializer />
+        <div className="flex h-full w-full">
           <Menu
-            direction="ltr"
-            mode="horizontal"
+            mode="vertical"
             items={[
               { key: "/", label: <Link href="/">Home</Link> },
               {
                 key: "/copywriting",
                 label: <Link href="/copywriting">Copywriting</Link>,
               },
+              {
+                key: "/monitor-platform",
+                label: "Monitor Platform",
+                children: [
+                  {
+                    key: "monitor-platform/test-collect-sdk",
+                    label: (
+                      <Link href="/monitor-platform/test-collect-sdk">
+                        Test Collect SDK
+                      </Link>
+                    ),
+                  },
+                ],
+              },
             ]}
           />
+          <div className="p-4 h-full w-full">{children}</div>
         </div>
-        <div className="p-4 h-full w-full">{children}</div>
       </body>
     </html>
   );
