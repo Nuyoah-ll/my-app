@@ -1,19 +1,21 @@
 import { EventType, RuntimeOptions } from "../types";
-import { getCommon, recordEvent } from "..";
+import { getCommon, MonitorSDK } from "..";
 import ErrorStackParser from "error-stack-parser";
 
 export class JsErrorPlugin {
   private runtimeOptions: RuntimeOptions;
+  private sdkInstance: MonitorSDK;
 
-  constructor(options: RuntimeOptions) {
+  constructor(options: RuntimeOptions, sdkInstance: MonitorSDK) {
     console.log("init JsErrorPlugin");
     this.runtimeOptions = options;
+    this.sdkInstance = sdkInstance;
     this.init();
   }
 
   async init() {
     window.addEventListener("error", (event) => {
-      recordEvent({
+      this.sdkInstance.recordEvent({
         ev_type: EventType.JsError,
         common: getCommon(this.runtimeOptions),
         payload: {
@@ -25,7 +27,7 @@ export class JsErrorPlugin {
     });
 
     window.addEventListener("unhandledrejection", (event) => {
-      recordEvent({
+      this.sdkInstance.recordEvent({
         ev_type: EventType.JsError,
         common: getCommon(this.runtimeOptions),
         payload: {

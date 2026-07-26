@@ -1,12 +1,14 @@
-import { getCommon, recordEvent } from "..";
+import { getCommon, MonitorSDK } from "..";
 import { EventType, RuntimeOptions } from "../types";
 
 export class ResourcePlugin {
+  private sdkInstance: MonitorSDK;
   private runtimeOptions: RuntimeOptions;
 
-  constructor(runtimeOptions: RuntimeOptions) {
+  constructor(runtimeOptions: RuntimeOptions, sdkInstance: MonitorSDK) {
     console.log("init ResourcePlugin");
     this.runtimeOptions = runtimeOptions;
+    this.sdkInstance = sdkInstance;
     this.init();
   }
 
@@ -32,7 +34,7 @@ export class ResourcePlugin {
           "resource",
         ) as PerformanceResourceTiming[];
         const timing = enties.find((item) => item.name === url);
-        recordEvent({
+        this.sdkInstance.recordEvent({
           ev_type: EventType.ResourceError,
           common: getCommon(this.runtimeOptions),
           payload: {
@@ -50,7 +52,7 @@ export class ResourcePlugin {
     // 采集资源加载时间
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((item) => {
-        recordEvent({
+        this.sdkInstance.recordEvent({
           ev_type: EventType.ResourcePerformance,
           common: getCommon(this.runtimeOptions),
           payload: {

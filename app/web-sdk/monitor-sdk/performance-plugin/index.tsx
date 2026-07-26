@@ -1,12 +1,14 @@
-import { getCommon, recordEvent } from "..";
+import { getCommon, MonitorSDK } from "..";
 import { EventType, RuntimeOptions } from "../types";
 import { onCLS, onINP } from "web-vitals";
 
 export class PerformancePlugin {
+  private sdkInstance: MonitorSDK;
   runtimeOptions: RuntimeOptions;
-  constructor(runtimeOptions: RuntimeOptions) {
+  constructor(runtimeOptions: RuntimeOptions, sdkInstance: MonitorSDK) {
     console.log("init PerformancePlugin");
     this.runtimeOptions = runtimeOptions;
+    this.sdkInstance = sdkInstance;
     this.collectPerformanceTiming();
   }
 
@@ -14,7 +16,7 @@ export class PerformancePlugin {
     const list = performance.getEntriesByType("paint");
     list.entries().forEach(([_, item]) => {
       if (item.name === "first-paint") {
-        recordEvent({
+        this.sdkInstance.recordEvent({
           ev_type: EventType.Performance,
           common: getCommon(this.runtimeOptions),
           payload: {
@@ -24,7 +26,7 @@ export class PerformancePlugin {
         });
       }
       if (item.name === "first-contentful-paint") {
-        recordEvent({
+        this.sdkInstance.recordEvent({
           ev_type: EventType.Performance,
           common: getCommon(this.runtimeOptions),
           payload: {
@@ -37,7 +39,7 @@ export class PerformancePlugin {
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.entryType === "largest-contentful-paint") {
-          recordEvent({
+          this.sdkInstance.recordEvent({
             ev_type: EventType.Performance,
             common: getCommon(this.runtimeOptions),
             payload: {
@@ -47,7 +49,7 @@ export class PerformancePlugin {
           });
         }
         if (entry.entryType === "navigation") {
-          recordEvent({
+          this.sdkInstance.recordEvent({
             ev_type: EventType.PerformanceNavigationTiming,
             common: getCommon(this.runtimeOptions),
             payload: {
@@ -63,7 +65,7 @@ export class PerformancePlugin {
 
     // 可以通过observer来观察type为layout-shift的性能事件来自己计算，但是比较麻烦，这里就不实现了
     onCLS((cls) => {
-      recordEvent({
+      this.sdkInstance.recordEvent({
         ev_type: EventType.Performance,
         common: getCommon(this.runtimeOptions),
         payload: {
@@ -73,7 +75,7 @@ export class PerformancePlugin {
       });
     });
     onINP((inp) => {
-      recordEvent({
+      this.sdkInstance.recordEvent({
         ev_type: EventType.Performance,
         common: getCommon(this.runtimeOptions),
         payload: {

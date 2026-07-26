@@ -8,15 +8,16 @@ import {
 import {
   Common,
   ReportedEvent,
-  EventType,
   MonitorSDKOptions,
   RuntimeOptions,
+  EventType,
 } from "./types";
 import { hookObjectProperty } from "./utils";
 import { JsErrorPlugin } from "./js-error-plugin";
 import { HttpPlugin } from "./http-plugin";
 import { ResourcePlugin } from "./resource-plugin";
 import { PerformancePlugin } from "./performance-plugin";
+import { BlankScreenPlugin } from "./blank-screen-plugin";
 
 export const getCommon = (options: RuntimeOptions): Common => {
   return {
@@ -32,15 +33,9 @@ export const getCommon = (options: RuntimeOptions): Common => {
   };
 };
 
-export const eventList: ReportedEvent[] = [];
-
-export const recordEvent = (event: ReportedEvent) => {
-  eventList.push(event);
-  console.log(event);
-};
-
 export class MonitorSDK {
   private currentPath: string | URL | undefined | null = location.pathname;
+  private userId: string;
   private viewId: string;
   private sessionId: string;
   private options: MonitorSDKOptions;
@@ -48,12 +43,14 @@ export class MonitorSDK {
   private httpPlugin: HttpPlugin | null = null;
   private resourcePlugin: ResourcePlugin | null = null;
   private performancePlugin: PerformancePlugin | null = null;
+  private blankScreenPlugin: BlankScreenPlugin | null = null;
+  private eventList: ReportedEvent[] = [];
   constructor(options: MonitorSDKOptions) {
     console.log(">>>>>>>>>>>>>>InitMonitorSDK");
-    options.userId = this.initUserId(options);
+    this.options = options;
+    this.userId = options.userId = this.initUserId(options);
     this.sessionId = this.initSessionId();
     this.viewId = this.initViewId();
-    this.options = options;
     const runtimeOptions: RuntimeOptions = {
       ...options,
       userId: options.userId,
@@ -65,6 +62,14 @@ export class MonitorSDK {
       ...(this.options.enable || {}),
     };
     this.initPlugins(runtimeOptions);
+  }
+
+  public recordEvent(event: ReportedEvent, relateToBlankScreen = true) {
+    if (relateToBlankScreen) {
+      this.blankScreenPlugin?.addRelatedEvent(event);
+    }
+    this.eventList.push(event);
+    console.log(event);
   }
 
   initUserId(options: MonitorSDKOptions): string {
@@ -90,6 +95,18 @@ export class MonitorSDK {
         if (newPath !== this.currentPath) {
           this.currentPath = newPath;
           this.viewId = nanoid();
+          this.recordEvent({
+            ev_type: EventType.PageView,
+            common: getCommon({
+              ...this.options,
+              viewId: this.viewId,
+              sessionId: this.sessionId,
+              userId: this.userId,
+            }),
+            payload: {
+              source: "pushState",
+            },
+          });
         }
         originPushState(...originPushStateParams);
       };
@@ -100,6 +117,18 @@ export class MonitorSDK {
         if (newPath !== this.currentPath) {
           this.currentPath = newPath;
           this.viewId = nanoid();
+          this.recordEvent({
+            ev_type: EventType.PageView,
+            common: getCommon({
+              ...this.options,
+              viewId: this.viewId,
+              sessionId: this.sessionId,
+              userId: this.userId,
+            }),
+            payload: {
+              source: "replaceState",
+            },
+          });
         }
         originReplaceState(...originReplaceStateParams);
       };
@@ -109,23 +138,51 @@ export class MonitorSDK {
       if (newPath !== this.currentPath) {
         this.currentPath = newPath;
         this.viewId = nanoid();
+        this.recordEvent({
+          ev_type: EventType.PageView,
+          common: getCommon({
+            ...this.options,
+            viewId: this.viewId,
+            sessionId: this.sessionId,
+            userId: this.userId,
+          }),
+          payload: {
+            source: "popstate",
+          },
+        });
       }
     });
-    return nanoid();
+    const viewId = nanoid();
+    this.recordEvent({
+      ev_type: EventType.PageView,
+      common: getCommon({
+        ...this.options,
+        viewId: viewId,
+        sessionId: this.sessionId,
+        userId: this.userId,
+      }),
+      payload: {
+        source: "initViewId",
+      },
+    });
+    return viewId;
   }
 
   initPlugins(runtimeOptions: RuntimeOptions) {
     if (this.options.enable?.jsError) {
-      this.jsErrorPlugin = new JsErrorPlugin(runtimeOptions);
+      this.jsErrorPlugin = new JsErrorPlugin(runtimeOptions, this);
     }
     if (this.options.enable?.http) {
-      this.httpPlugin = new HttpPlugin(runtimeOptions);
+      this.httpPlugin = new HttpPlugin(runtimeOptions, this);
+    }
+    if (this.options.enable?.blankScreen) {
+      this.blankScreenPlugin = new BlankScreenPlugin(runtimeOptions, this);
     }
     if (this.options.enable?.resource) {
-      this.resourcePlugin = new ResourcePlugin(runtimeOptions);
+      this.resourcePlugin = new ResourcePlugin(runtimeOptions, this);
     }
     if (this.options.enable?.performance) {
-      this.performancePlugin = new PerformancePlugin(runtimeOptions);
+      this.performancePlugin = new PerformancePlugin(runtimeOptions, this);
     }
   }
 }

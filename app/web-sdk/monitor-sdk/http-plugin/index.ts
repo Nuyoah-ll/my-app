@@ -1,13 +1,15 @@
-import { getCommon, recordEvent } from "..";
+import { getCommon, MonitorSDK } from "..";
 import { EventType, RuntimeOptions } from "../types";
 import { hookObjectProperty } from "../utils";
 
 export class HttpPlugin {
   private runtimeOptions: RuntimeOptions;
+  private sdkInstance: MonitorSDK;
 
-  constructor(runtimeOptions: RuntimeOptions) {
+  constructor(runtimeOptions: RuntimeOptions, sdkInstance: MonitorSDK) {
     console.log("init HttpPlugin");
     this.runtimeOptions = runtimeOptions;
+    this.sdkInstance = sdkInstance;
     this.init();
   }
 
@@ -31,7 +33,7 @@ export class HttpPlugin {
               "resource",
             ) as PerformanceResourceTiming[];
             const timing = entries.find((entry) => entry.name === url);
-            recordEvent({
+            this.sdkInstance.recordEvent({
               ev_type: EventType.Http,
               common: getCommon(this.runtimeOptions),
               payload: {
@@ -49,7 +51,7 @@ export class HttpPlugin {
             return response;
           })
           .catch((error) => {
-            recordEvent({
+            this.sdkInstance.recordEvent({
               ev_type: EventType.Http,
               common: getCommon(this.runtimeOptions),
               payload: {

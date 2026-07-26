@@ -8,6 +8,7 @@ import {
   ResourceErrorPayload,
   ResourceTimingPayload,
 } from "./resource-plugin/types";
+import { BlankScreenPayload } from "./blank-screen-plugin/types";
 
 export interface MonitorSDKOptions {
   bid: string;
@@ -28,6 +29,7 @@ export interface RuntimeOptions extends MonitorSDKOptions {
 }
 
 export enum EventType {
+  PageView = "pageView",
   JsError = "jsError",
   Http = "http",
   ResourceError = "resourceError",
@@ -49,14 +51,20 @@ export interface Common {
   userAgent?: string;
 }
 
+export interface PageViewPayload {
+  source: string; // 触发原因，例如：切换路由、初始化加载
+}
+
 export interface ReportedEvent {
   ev_type: EventType;
   common: Common;
   payload:
+    | PageViewPayload
     | JsErrorPayload
     | HttpPayload
     | ResourceErrorPayload
     | ResourceTimingPayload
     | PerformancePayload
-    | NavigationPerformancePayload;
+    | NavigationPerformancePayload
+    | BlankScreenPayload;
 }
