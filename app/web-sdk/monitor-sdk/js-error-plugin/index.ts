@@ -20,6 +20,7 @@ export class JsErrorPlugin {
         common: getCommon(this.runtimeOptions),
         payload: {
           type: event.type,
+          name: event.error.stack.split(":")[0],
           message: event.error.message,
           stack: ErrorStackParser.parse(event.error),
         },
@@ -32,6 +33,7 @@ export class JsErrorPlugin {
         common: getCommon(this.runtimeOptions),
         payload: {
           type: event.type,
+          name: event.reason.stack.split(":")[0],
           message: event.reason.message,
           stack: ErrorStackParser.parse(event.reason),
         },

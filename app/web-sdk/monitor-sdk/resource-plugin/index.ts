@@ -38,7 +38,7 @@ export class ResourcePlugin {
           ev_type: EventType.ResourceError,
           common: getCommon(this.runtimeOptions),
           payload: {
-            initiatorType: target.tagName.toLowerCase(),
+            type: target.tagName.toLowerCase(),
             url,
             timing,
           },
@@ -56,7 +56,6 @@ export class ResourcePlugin {
           ev_type: EventType.ResourcePerformance,
           common: getCommon(this.runtimeOptions),
           payload: {
-            initiatorType: item.name,
             url: item.name,
             timing: item as PerformanceResourceTiming,
           },

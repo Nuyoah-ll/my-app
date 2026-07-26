@@ -1,11 +1,10 @@
 export interface ResourceErrorPayload {
   url: string;
-  initiatorType: string;
+  type: string;
   timing?: PerformanceResourceTiming;
 }
 
 export interface ResourceTimingPayload {
   url: string;
-  initiatorType: string;
   timing?: PerformanceResourceTiming;
 }
