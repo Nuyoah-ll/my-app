@@ -9,7 +9,10 @@ export async function request<T>(
   url: string,
   options: RequestInit & CustomRequestOptions,
 ): Promise<Awaited<T> | undefined> {
-  const jsonRes = await fetch(url, options);
+  const jsonRes = await fetch(url, {
+    ...options,
+    headers: { ...(options.headers || {}), "Content-Type": "application/json" },
+  });
   const res = await jsonRes.json();
   if (res?.code === 0) {
     return options.returnBody ? res : res?.data;
