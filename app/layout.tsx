@@ -63,6 +63,14 @@ export default function RootLayout({
                 label: <div>用户点评项目（练习redis）</div>,
                 children: [
                   {
+                    key: "/dianping/home",
+                    label: <Link href="/dianping/home">首页</Link>,
+                  },
+                  {
+                    key: "/dianping/list",
+                    label: <Link href="/dianping/list">商户列表</Link>,
+                  },
+                  {
                     key: "/dianping/login",
                     label: <Link href="/dianping/login">登录</Link>,
                   },

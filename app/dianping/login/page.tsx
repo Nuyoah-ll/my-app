@@ -51,6 +51,9 @@ export default function LoginPage() {
       message.success("登录成功");
       router.push("/dianping/me");
     },
+    {
+      manual: true,
+    },
   );
 
   return (
