@@ -63,36 +63,54 @@
 .coverSection {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 12px;
+  width: 100%;
 }
 
 .mainCover {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 200px;
   border-radius: 12px;
   overflow: hidden;
+  :global(.ant-image) {
+    width: 100%;
+  }
 }
 
 .coverImg {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+
+  :global(.ant-image-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .thumbList {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 8px;
   width: 100%;
 }
 
 .thumbItem {
-  flex: 1;
-  aspect-ratio: 1;
+  width: calc(50% - 4px);
+  height: 150px;
   border-radius: 8px;
   overflow: hidden;
 
-  img {
+  :global(.ant-image) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.ant-image-img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -246,6 +264,7 @@
 
 .voucherSection {
   padding: 0;
+  margin-bottom: 20px;
 }
 
 .sectionTitle {
@@ -269,25 +288,29 @@
 }
 
 .voucherCard {
-  background: #fff;
+  background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
   border-radius: 12px;
   padding: 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
-  border: 1px solid #f3f4f6;
+  border: 1px solid #ffd591;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .voucherInfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .voucherTitle {
   font-size: 15px;
   font-weight: 500;
   color: #1f2937;
-  margin-bottom: 6px;
 }
 
 .voucherDate {
@@ -296,6 +319,29 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.voucherRules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.6;
+
+  li {
+    position: relative;
+    padding-left: 12px;
+
+    &::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #9ca3af;
+      font-weight: 700;
+    }
+  }
 }
 
 .voucherPrice {
@@ -332,7 +378,7 @@
 
 .voucherAction {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: flex-end;
   gap: 8px;
   flex-shrink: 0;
@@ -347,9 +393,24 @@
   border-radius: 8px;
   background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
   border: none;
+  box-shadow: none;
+  min-width: 88px;
+  height: 40px;
+  flex-shrink: 0;
+  transform: translateZ(0);
+  will-change: background-color;
 
-  &:hover {
+  :global(.ant-btn-wave) {
+    display: none;
+  }
+
+  &:hover,
+  &:active,
+  &:focus {
     background: linear-gradient(135deg, #ff5722 0%, #f57c00 100%);
+    box-shadow: none !important;
+    border-color: transparent !important;
+    transform: translateZ(0) scale(1) !important;
   }
 }
 

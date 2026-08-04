@@ -48,11 +48,19 @@ export interface Feed {
 
 export interface Voucher {
   id: number;
+  shop_id: number;
   title: string;
-  discount: string;
-  original_price: number;
-  discount_price: number;
-  valid_date: string;
-  stock: number;
-  sold: number;
+  sub_title: string;
+  /** 面值（分） */
+  actual_value: number;
+  /** 支付价（分） */
+  pay_value: number;
+  type: number;
+  status: number;
+  stock: number | null;
+  begin_time: string | null;
+  end_time: string | null;
+  rules: string;
+  create_time?: string;
+  update_time?: string;
 }

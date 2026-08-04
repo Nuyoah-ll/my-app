@@ -26,7 +26,6 @@ export default function ShopDetailPage() {
 
   const { run: getShopDetail, loading } = useRequest(
     async () => {
-      console.log("触发急促", shopId);
       const res = await request<ShopDetail>(
         `http://localhost:3001/dianping/shop/detail?shopId=${shopId}`,
         {
@@ -42,7 +41,7 @@ export default function ShopDetailPage() {
   const { data: vouchers, loading: voucherLoading } = useRequest(
     () =>
       request<Voucher[]>(
-        `http://localhost:3001/dianping/shop/${shopId}/vouchers`,
+        `http://localhost:3001/dianping/voucher/list?shopId=${shopId}`,
         {
           method: "GET",
           credentials: "include",
@@ -53,10 +52,39 @@ export default function ShopDetailPage() {
 
   const displayVouchers = vouchers ?? [];
 
+  /** 分 -> 元 */
+  const fenToYuan = (fen: number) => (fen / 100).toFixed(2);
+
+  /** 计算折扣文案，如 9.5 折 */
+  const getDiscountText = (actual: number, pay: number) => {
+    if (!actual) return "";
+    const rate = (pay / actual) * 10;
+    if (rate >= 10) return "";
+    return `${rate.toFixed(rate % 1 === 0 ? 0 : 1)}折`;
+  };
+
+  /** 有效期文案：优先 begin/end_time，否则 sub_title */
+  const getValidDateText = (v: Voucher) => {
+    if (v.begin_time && v.end_time) {
+      return `${v.begin_time.slice(0, 10)} 至 ${v.end_time.slice(0, 10)}`;
+    }
+    return v.sub_title || "";
+  };
+
+  const getRuleLines = (rules: string) =>
+    (rules || "")
+      .replace(/\\n/g, "\n")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
   useEffect(() => {
     if (shopId) {
       // 模拟高并发场景
       // new Array(50).fill(null).forEach(() => getShopDetail());
+      // setTimeout(() => {
+      //   new Array(50).fill(null).forEach(() => getShopDetail());
+      // }, 5000);
       getShopDetail();
     }
   }, [shopId]);
@@ -205,42 +233,59 @@ export default function ShopDetailPage() {
           <Empty description="暂无代金券" className={styles.emptyState} />
         ) : (
           <div className={styles.voucherList}>
-            {displayVouchers.map((voucher) => (
-              <div key={voucher.id} className={styles.voucherCard}>
-                <div className={styles.voucherInfo}>
-                  <div className={styles.voucherTitle}>{voucher.title}</div>
-                  <div className={styles.voucherDate}>
-                    <CalendarOutlined /> {voucher.valid_date}均可用
+            {displayVouchers.map((voucher) => {
+              const originalPrice = fenToYuan(voucher.actual_value);
+              const payPrice = fenToYuan(voucher.pay_value);
+              const discountText = getDiscountText(
+                voucher.actual_value,
+                voucher.pay_value,
+              );
+              const validDateText = getValidDateText(voucher);
+              const ruleLines = getRuleLines(voucher.rules);
+              return (
+                <div key={voucher.id} className={styles.voucherCard}>
+                  <div className={styles.voucherInfo}>
+                    <div className={styles.voucherTitle}>{voucher.title}</div>
+                    {validDateText && (
+                      <div className={styles.voucherDate}>
+                        <CalendarOutlined /> {validDateText}
+                      </div>
+                    )}
+                    {ruleLines.length > 0 && (
+                      <ul className={styles.voucherRules}>
+                        {ruleLines.map((r, i) => (
+                          <li key={i}>{r}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <div className={styles.voucherPrice}>
+                    <div className={styles.priceRow}>
+                      <span className={styles.originalPrice}>¥{originalPrice}</span>
+                      {discountText && (
+                        <span className={styles.discountTag}>{discountText}</span>
+                      )}
+                    </div>
+                    <div className={styles.discountPrice}>¥{payPrice}</div>
+                  </div>
+                  <div className={styles.voucherAction}>
+                    <div className={styles.soldInfo}>
+                      {voucher.stock == null
+                        ? "库存充足"
+                        : `库存 ${voucher.stock}`}
+                    </div>
+                    <Button
+                      type="primary"
+                      size="large"
+                      className={styles.purchaseBtn}
+                      onClick={() => handlePurchase(voucher)}
+                    >
+                      抢购
+                    </Button>
                   </div>
                 </div>
-                <div className={styles.voucherPrice}>
-                  <div className={styles.priceRow}>
-                    <span className={styles.originalPrice}>
-                      ¥{voucher.original_price.toFixed(2)}
-                    </span>
-                    <span className={styles.discountTag}>
-                      {voucher.discount}
-                    </span>
-                  </div>
-                  <div className={styles.discountPrice}>
-                    ¥{voucher.discount_price.toFixed(2)}
-                  </div>
-                </div>
-                <div className={styles.voucherAction}>
-                  <div className={styles.soldInfo}>
-                    已售 {voucher.sold}/{voucher.stock}
-                  </div>
-                  <Button
-                    type="primary"
-                    size="large"
-                    className={styles.purchaseBtn}
-                    onClick={() => handlePurchase(voucher)}
-                  >
-                    抢购
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

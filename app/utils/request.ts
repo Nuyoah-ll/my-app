@@ -10,6 +10,7 @@ export async function request<T>(
   options: RequestInit & CustomRequestOptions,
 ): Promise<Awaited<T> | undefined> {
   const jsonRes = await fetch(url, {
+    credentials: 'include',
     ...options,
     headers: { ...(options.headers || {}), "Content-Type": "application/json" },
   });

@@ -49,7 +49,7 @@ export default function LoginPage() {
         body: JSON.stringify(values),
       });
       message.success("登录成功");
-      router.push("/dianping/me");
+      router.push("/");
     },
     {
       manual: true,
