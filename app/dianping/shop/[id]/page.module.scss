@@ -305,17 +305,21 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding-right: 8px;
 }
 
 .voucherTitle {
   font-size: 15px;
   font-weight: 500;
   color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .voucherDate {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: 11px;
+  color: #b0b0b0;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -344,16 +348,12 @@
   }
 }
 
-.voucherPrice {
-  text-align: right;
-  min-width: 120px;
-}
-
 .priceRow {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  flex: 1;
 }
 
 .originalPrice {
@@ -378,15 +378,30 @@
 
 .voucherAction {
   display: flex;
-  flex-direction: column-reverse;
-  align-items: flex-end;
+  flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
+  min-width: 0;
+  align-items: flex-end;
+}
+
+.actionTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .soldInfo {
   font-size: 12px;
   color: #9ca3af;
+}
+
+.actionBottom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .purchaseBtn {

@@ -89,8 +89,18 @@ export default function ShopDetailPage() {
     }
   }, [shopId]);
 
-  const handlePurchase = (voucher: Voucher) => {
-    message.success(`已抢 ${voucher.title}`);
+  const handlePurchase = async (voucher: Voucher) => {
+    try {
+      const voucherId = await request("http://localhost:3001/dianping/voucher/order/create", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ voucher_id: voucher.id }),
+      });
+      message.success(`已抢购 ${voucherId}`);
+    } catch {
+      message.error("抢购失败，请重试");
+    }
   };
 
   const handleShare = () => {
@@ -246,11 +256,6 @@ export default function ShopDetailPage() {
                 <div key={voucher.id} className={styles.voucherCard}>
                   <div className={styles.voucherInfo}>
                     <div className={styles.voucherTitle}>{voucher.title}</div>
-                    {validDateText && (
-                      <div className={styles.voucherDate}>
-                        <CalendarOutlined /> {validDateText}
-                      </div>
-                    )}
                     {ruleLines.length > 0 && (
                       <ul className={styles.voucherRules}>
                         {ruleLines.map((r, i) => (
@@ -259,29 +264,42 @@ export default function ShopDetailPage() {
                       </ul>
                     )}
                   </div>
-                  <div className={styles.voucherPrice}>
-                    <div className={styles.priceRow}>
-                      <span className={styles.originalPrice}>¥{originalPrice}</span>
-                      {discountText && (
-                        <span className={styles.discountTag}>{discountText}</span>
-                      )}
-                    </div>
-                    <div className={styles.discountPrice}>¥{payPrice}</div>
-                  </div>
                   <div className={styles.voucherAction}>
-                    <div className={styles.soldInfo}>
+                    <div className={styles.actionTop}>
+                      <div className={styles.priceRow}>
+                        <span className={styles.discountPrice}>
+                          ¥{payPrice}
+                        </span>
+                        {discountText && (
+                          <span className={styles.discountTag}>
+                            {discountText}
+                          </span>
+                        )}
+                        <span className={styles.originalPrice}>
+                          ¥{originalPrice}
+                        </span>
+                      </div>
+                      <Button
+                        type="primary"
+                        size="large"
+                        className={styles.purchaseBtn}
+                        onClick={() => handlePurchase(voucher)}
+                      >
+                        抢购
+                      </Button>
+                    </div>
+                    <span className={styles.soldInfo}>
                       {voucher.stock == null
                         ? "库存充足"
                         : `库存 ${voucher.stock}`}
+                    </span>
+                    <div className={styles.actionBottom}>
+                      {validDateText && (
+                        <span className={styles.voucherDate}>
+                          <CalendarOutlined /> {validDateText}
+                        </span>
+                      )}
                     </div>
-                    <Button
-                      type="primary"
-                      size="large"
-                      className={styles.purchaseBtn}
-                      onClick={() => handlePurchase(voucher)}
-                    >
-                      抢购
-                    </Button>
                   </div>
                 </div>
               );
